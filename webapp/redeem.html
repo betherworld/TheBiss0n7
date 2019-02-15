@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="au theme template">
+    <meta name="author" content="Hau Nguyen">
+    <meta name="keywords" content="au theme template">
+
+    <!-- Title Page-->
+    <title>Redeem Token</title>
+
+    <!-- Fontfaces CSS-->
+    <link href="css/font-face.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-5/css/fontawesome-all.min.css" rel="stylesheet" media="all">
+    <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+
+    <!-- Bootstrap CSS-->
+    <link href="vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+
+    <!-- Vendor CSS-->
+    <link href="vendor/animsition/animsition.min.css" rel="stylesheet" media="all">
+    <link href="vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet" media="all">
+    <link href="vendor/wow/animate.css" rel="stylesheet" media="all">
+    <link href="vendor/css-hamburgers/hamburgers.min.css" rel="stylesheet" media="all">
+    <link href="vendor/slick/slick.css" rel="stylesheet" media="all">
+    <link href="vendor/select2/select2.min.css" rel="stylesheet" media="all">
+    <link href="vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
+
+    <!-- Main CSS-->
+    <link href="css/theme.css" rel="stylesheet" media="all">
+
+    <!-- Web3 JS -->
+    <script type="text/javascript" src="js/web3.min.js"></script>
+    <script type="text/javascript">
+
+    var Web3 = require('web3');
+    var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+
+    web3.eth.defaultAccount = web3.eth.accounts[1]; // John Doe's Account
+    var BisonContract = web3.eth.contract([
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "greenTokens",
+				"type": "uint256"
+			},
+			{
+				"name": "communityTokens",
+				"type": "uint256"
+			}
+		],
+		"name": "decreaseTokens",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"name": "greenTokens",
+				"type": "uint256"
+			},
+			{
+				"name": "communityTokens",
+				"type": "uint256"
+			}
+		],
+		"name": "increaseTokens",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "greenTokens",
+				"type": "uint256"
+			},
+			{
+				"name": "communityTokens",
+				"type": "uint256"
+			}
+		],
+		"name": "insertNewDonation",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "receiver",
+				"type": "address"
+			},
+			{
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "sendGreenTokens",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "greenTokens",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"name": "communityTokens",
+				"type": "uint256"
+			}
+		],
+		"name": "Donation",
+		"type": "event"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "addr",
+				"type": "address"
+			}
+		],
+		"name": "queryCommunityTokenBalance",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "addr",
+				"type": "address"
+			}
+		],
+		"name": "queryGreenTokenBalance",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]);
+
+    var Bison = BisonContract.at('0x35932164916943Eb2c0d10B443df14991Dfe2A9A');
+    var JohnDoe = '0x418ac5460e3Ffb1eB597012950a57da721e85FE2';
+
+    function getBalanceGreen() {
+        document.getElementById("greenTokenBalance").innerText = Bison.queryGreenTokenBalance(JohnDoe);
+    }
+
+    function getBalanceCommunity() {
+        document.getElementById("communityTokenBalance").innerText = Bison.queryCommunityTokenBalance(JohnDoe);
+    }
+
+    function spendGreenTokens(amount){
+      Bison.decreaseTokens(amount, 0);
+      document.getElementById("claimSymbol").style.display = "none";
+      document.getElementById("claimedStatus").innerText = "claimed"
+      getBalanceGreen();
+    }
+
+    function init(){
+      getBalanceGreen();
+      getBalanceCommunity();
+    }
+
+    function upvote(id){
+      var voteCount = 10;
+      Bison.decreaseTokens(0, voteCount);
+      getBalanceCommunity();
+      var value = parseInt(document.getElementById(id).value, 10);
+      value = isNaN(value) ? 0 : value;
+      if (Bison.queryCommunityTokenBalance(JohnDoe) >= voteCount){
+        value++;
+      } else {
+        alert("Not enough community tokens")
+      }
+      document.getElementById(id).value = value;
+    }
+
+    window.onload = init;
+  </script>
+
+</head>
+
+<body class="animsition">
+    <div class="page-wrapper">
+        <!-- HEADER MOBILE-->
+        <header class="header-mobile d-block d-lg-none">
+            <div class="header-mobile__bar">
+                <div class="container-fluid">
+                    <div class="header-mobile-inner">
+                        <a class="logo" href="index.html">
+                            <img src="images/icon/logo.png"/>
+                        </a>
+                        <button class="hamburger hamburger--slider" type="button">
+                            <span class="hamburger-box">
+                                <span class="hamburger-inner"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <nav class="navbar-mobile">
+                <div class="container-fluid">
+                    <ul class="navbar-mobile__list list-unstyled">
+                      <li>
+                          <a href="index.html">
+                              <i class="fas fa-tachometer-alt"></i>Overview</a>
+                      </li>
+                      <li>
+                          <a href="actions.html">
+                              <i class="fas fa-leaf"></i>Actions</a>
+                      </li>
+                      <li class="active has-sub">
+                          <a href="redeem.html">
+                              <i class="fas fa-gift"></i>Redeem Token</a>
+                      </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <!-- END HEADER MOBILE-->
+
+        <!-- MENU SIDEBAR-->
+        <aside class="menu-sidebar d-none d-lg-block">
+            <div class="logo">
+                <a href="#">
+                    <img src="images/icon/logo.png" alt="WWF Logo" />
+                </a>
+            </div>
+            <div class="menu-sidebar__content js-scrollbar1">
+                <nav class="navbar-sidebar">
+                    <ul class="list-unstyled navbar__list">
+                        <li>
+                            <a href="index.html">
+                                <i class="fas fa-tachometer-alt"></i>Overview</a>
+                        </li>
+                        <li>
+                            <a href="actions.html">
+                                <i class="fas fa-leaf"></i>Actions</a>
+                        </li>
+                        <li class="active has-sub">
+                            <a href="redeem.html">
+                                <i class="fas fa-gift"></i>Redeem Token</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+        <!-- END MENU SIDEBAR-->
+
+        <!-- PAGE CONTAINER-->
+        <div class="page-container">
+            <!-- HEADER DESKTOP-->
+            <header class="header-desktop">
+                <div class="section__content section__content--p30">
+                    <div class="container-fluid">
+                        <div class="header-wrap">
+                            <form class="form-header" action="" method="POST">
+                                <input class="au-input au-input--xl" type="text" name="search" placeholder="Search for actions..." />
+                                <button class="au-btn--submit" type="submit">
+                                    <i class="zmdi zmdi-search"></i>
+                                </button>
+                            </form>
+                            <div class="header-button">
+                                <div class="noti-wrap">
+                                    <div class="noti__item js-item-menu">
+                                        <i class="zmdi zmdi-email"></i>
+                                        <div class="email-dropdown js-dropdown">
+                                            <div class="email__title">
+                                                <p>You have no new messages</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="noti__item js-item-menu">
+                                        <i class="zmdi zmdi-notifications"></i>
+                                        <span class="quantity">3</span>
+                                        <div class="notifi-dropdown js-dropdown">
+                                            <div class="notifi__title">
+                                                <p>You have 3 Notifications</p>
+                                            </div>
+                                            <div class="notifi__item">
+                                                <div class="bg-c1 img-cir img-40">
+                                                    <i class="zmdi zmdi-badge-check"></i>
+                                                </div>
+                                                <div class="content">
+                                                    <p>Your claim has been verified.</p>
+                                                    <span class="date">April 12, 2019 06:50</span>
+                                                </div>
+                                            </div>
+                                            <div class="notifi__item">
+                                                <div class="bg-c1 img-cir img-40">
+                                                    <i class="zmdi zmdi-badge-check"></i>
+                                                </div>
+                                                <div class="content">
+                                                    <p>Your claim has been verified.</p>
+                                                    <span class="date">April 12, 2019 06:50</span>
+                                                </div>
+                                            </div>
+                                            <div class="notifi__item">
+                                                <div class="bg-c3 img-cir img-40">
+                                                    <i class="zmdi zmdi-landscape"></i>
+                                                </div>
+                                                <div class="content">
+                                                    <p>New actions available!</p>
+                                                    <span class="date">April 12, 2019 06:50</span>
+                                                </div>
+                                            </div>
+                                            <div class="notifi__footer">
+                                                <a href="#">All notifications</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="account-wrap">
+                                    <div class="account-item clearfix js-item-menu">
+                                        <div class="image">
+                                            <img src="images/icon/avatar.jpg" alt="John Doe" />
+                                        </div>
+                                        <div class="content">
+                                            <a class="js-acc-btn" href="#">john doe</a>
+                                        </div>
+                                        <div class="account-dropdown js-dropdown">
+                                            <div class="info clearfix">
+                                                <div class="image">
+                                                    <a href="#">
+                                                        <img src="images/icon/avatar.jpg" alt="John Doe" />
+                                                    </a>
+                                                </div>
+                                                <div class="content">
+                                                    <h5 class="name">
+                                                        <a href="#">john doe</a>
+                                                    </h5>
+                                                    <span class="email">john.doe</span>
+                                                </div>
+                                            </div>
+                                            <div class="account-dropdown__body">
+                                                <div class="account-dropdown__item">
+                                                    <a href="#">
+                                                        <i class="zmdi zmdi-account"></i>Account</a>
+                                                </div>
+                                                <div class="account-dropdown__item">
+                                                    <a href="#">
+                                                        <i class="zmdi zmdi-settings"></i>Setting</a>
+                                                </div>
+                                            </div>
+                                            <div class="account-dropdown__footer">
+                                                <a href="login.html">
+                                                    <i class="zmdi zmdi-power"></i>Logout</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <!-- HEADER DESKTOP-->
+
+            <!-- MAIN CONTENT-->
+            <div class="main-content">
+                <div class="section__content section__content--p30">
+                    <div class="container-fluid">
+                      <h3 class="title-5 m-b-35">Token Overview</h3>
+                      <div class="row m-t-25">
+                          <div class="col-sm-6 col-lg-3">
+                              <div class="overview-item overview-item--c4">
+                                  <div class="overview__inner">
+                                      <div class="overview-box clearfix">
+                                          <div class="icon">
+                                              <i class="zmdi zmdi-money"></i>
+                                          </div>
+                                          <div class="text">
+                                              <h2><div id="greenTokenBalance"></div></h2>
+                                              <span>green tokens</span>
+                                          </div>
+                                      </div>
+                                      <div class="overview-chart">
+                                          <canvas id="widgetChart4"></canvas>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="col-sm-6 col-lg-3">
+                              <div class="overview-item overview-item--c1">
+                                  <div class="overview__inner">
+                                      <div class="overview-box clearfix">
+                                          <div class="icon">
+                                              <i class="zmdi zmdi-account-o"></i>
+                                          </div>
+                                          <div class="text">
+                                              <h2><div id="communityTokenBalance"></div></h2>
+                                              <span>community tokens</span>
+                                          </div>
+                                      </div>
+                                      <div class="overview-chart">
+                                          <canvas id="widgetChart1"></canvas>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row">
+                          <div class="col-md-12">
+                              <!-- DATA TABLE -->
+                              <h3 class="title-5 m-b-35">Green Rewards</h3>
+                              <div class="table-data__tool">
+                                  <div class="table-data__tool-left">
+                                  </div>
+                                  <div class="table-data__tool-right">
+                                      <button class="au-btn au-btn-icon au-btn--green au-btn--small">
+                                          <i class="zmdi zmdi-plus"></i>Propose Reward</button>
+                                  </div>
+                              </div>
+                              <div class="table-responsive table-responsive-data2">
+                                  <table class="table table-data2">
+                                      <thead>
+                                          <tr>
+                                              <th>voted priority</th>
+                                              <th>description</th>
+                                              <th>date of proposition</th>
+                                              <th>funding status</th>
+                                              <th>token price</th>
+                                              <th></th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr class="tr-shadow">
+                                              <td>1</td>
+                                              <td class="desc">Store Dicount</td>
+                                              <td>2018-09-27 02:12</td>
+                                              <td>
+                                                <div class="progress mb-2">
+                                                  <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0"
+                                                   aria-valuemax="100">100%</div>
+                                                </div>
+                                              </td>
+                                              <td>75</td>
+                                              <td>
+                                                <div id="claimSymbol" class="table-data-feature">
+                                                    <button onclick="spendGreenTokens(75)" class="item" data-toggle="tooltip" data-placement="top" title="Claim Reward">
+                                                        <i class="zmdi zmdi-lock-open"></i>
+                                                    </button>
+                                                </div>
+                                                <div id="claimedStatus"></div>
+                                              </td>
+                                          </tr>
+                                          <tr class="spacer"></tr>
+                                          <tr class="tr-shadow">
+                                              <td>2</td>
+                                              <td class="desc">More Pots & Pans</td>
+                                              <td>2018-09-29 05:57</td>
+                                              <td>
+                                                <div class="progress mb-2">
+                                                  <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0"
+                                                   aria-valuemax="100"></div>
+                                                </div>
+                                              </td>
+                                              <td>500</td>
+                                              <td>
+                                                  <div class="table-data-feature">
+                                                      <button class="item"  data-placement="top" title="Claim Reward">
+                                                          <i class="zmdi zmdi-lock"></i>
+                                                      </button>
+                                                  </div>
+                                              </td>
+                                          </tr>
+                                          <tr class="spacer"></tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                              <div class="user-data__footer">
+                                  <button class="au-btn au-btn-load">load more</button>
+                              </div>
+                              <!-- END DATA TABLE -->
+                          </div>
+                      </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!-- DATA TABLE -->
+                                <h3 class="title-5 m-b-35">Community Rewards</h3>
+                                <div class="table-data__tool">
+                                    <div class="table-data__tool-left">
+                                    </div>
+                                    <div class="table-data__tool-right">
+                                        <button class="au-btn au-btn-icon au-btn--green au-btn--small">
+                                            <i class="zmdi zmdi-plus"></i>Propose Reward</button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive table-responsive-data2">
+                                    <table class="table table-data2">
+                                        <thead>
+                                            <tr>
+                                                <th>voted priority</th>
+                                                <th>description</th>
+                                                <th>date of proposition</th>
+                                                <th>funding status</th>
+                                                <th>number of votes</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="tr-shadow">
+                                                <td>1</td>
+                                                <td class="desc">Sewage management facility</td>
+                                                <td>2018-09-27 02:12</td>
+                                                <td>
+                                                  <div class="progress mb-2">
+                              											<div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0"
+                              											 aria-valuemax="100">95%</div>
+                              										</div>
+                                                </td>
+                                                <td><input id="number1" value="221" readonly></td>
+                                                <td>
+                                                    <div class="table-data-feature">
+                                                        <button class="item" onclick="upvote('number1')" data-toggle="tooltip" data-placement="top" title="Upvote">
+                                                            <i class="zmdi zmdi-thumb-up"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="spacer"></tr>
+                                            <tr class="tr-shadow">
+                                                <td>2</td>
+                                                <td class="desc">Doctors office / medical dispensary</td>
+                                                <td>2018-09-29 05:57</td>
+                                                <td>
+                                                  <div class="progress mb-2">
+                                                    <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0"
+                                                     aria-valuemax="100"></div>
+                                                  </div>
+                                                </td>
+                                                  <td><input id="number2" value="112" readonly></td>
+                                                <td>
+                                                    <div class="table-data-feature">
+                                                        <button class="item" onclick="upvote('number2')" data-toggle="tooltip" data-placement="top" title="Upvote">
+                                                            <i class="zmdi zmdi-thumb-up"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="spacer"></tr>
+                                            <tr class="tr-shadow">
+                                                <td>3</td>
+                                                <td class="desc">Distribution center for local producers</td>
+                                                <td>2018-09-25 19:03</td>
+                                                <td>
+                                                  <div class="progress mb-2">
+                                                    <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 65%;" aria-valuenow="50" aria-valuemin="0"
+                                                     aria-valuemax="100"></div>
+                                                  </div>
+                                                </td>
+                                                <td><input id="number3" value="89" readonly></td>
+                                                <td>
+                                                    <div class="table-data-feature">
+                                                        <button class="item" onclick="upvote('number3')" data-toggle="tooltip" data-placement="top" title="Upvote">
+                                                            <i class="zmdi zmdi-thumb-up"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="spacer"></tr>
+                                            <tr class="tr-shadow">
+                                                <td>4</td>
+                                                <td class="desc">Better filtration system</td>
+                                                <td>2018-09-24 19:10</td>
+                                                <td>
+                                                  <div class="progress mb-2">
+                                                    <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0"
+                                                     aria-valuemax="100"></div>
+                                                  </div>
+                                                </td>
+                                                <td><input id="number4" value="56" readonly></td>
+                                                <td>
+                                                    <div class="table-data-feature">
+                                                        <button class="item" onclick="upvote('number4')" data-toggle="tooltip" data-placement="top" title="Upvote">
+                                                            <i class="zmdi zmdi-thumb-up"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="user-data__footer">
+                                    <button class="au-btn au-btn-load">load more</button>
+                                </div>
+                                <!-- END DATA TABLE -->
+                            </div>
+                        </div>
+                        <div class="row m-t-30">
+                            <div class="col-md-12">
+                                <!-- DATA TABLE-->
+                                <h3 class="title-5 m-b-35">Past Rewards</h3>
+                                <div class="table-responsive m-b-40">
+                                    <table class="table table-borderless table-data3">
+                                        <thead>
+                                            <tr>
+                                                <th>date</th>
+                                                <th>type</th>
+                                                <th>description</th>
+                                                <th>status</th>
+                                                <th>token price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>2018-09-29 05:57</td>
+                                                <td>Green Reward</td>
+                                                <td>Pots & Pans</td>
+                                                <td class="process">Unlocked</td>
+                                                <td>95</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2018-09-28 01:22</td>
+                                                <td>Community Reward</td>
+                                                <td>Freshwater filtration system</td>
+                                                <td class="process">Unlocked</td>
+                                                <td>bonus funded</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- END DATA TABLE-->
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="copyright">
+                                      <p>Prototype for the BETH 2019 WWF Challenge.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Jquery JS-->
+    <script src="vendor/jquery-3.2.1.min.js"></script>
+    <!-- Bootstrap JS-->
+    <script src="vendor/bootstrap-4.1/popper.min.js"></script>
+    <script src="vendor/bootstrap-4.1/bootstrap.min.js"></script>
+    <!-- Vendor JS       -->
+    <script src="vendor/slick/slick.min.js">
+    </script>
+    <script src="vendor/wow/wow.min.js"></script>
+    <script src="vendor/animsition/animsition.min.js"></script>
+    <script src="vendor/bootstrap-progressbar/bootstrap-progressbar.min.js">
+    </script>
+    <script src="vendor/counter-up/jquery.waypoints.min.js"></script>
+    <script src="vendor/counter-up/jquery.counterup.min.js">
+    </script>
+    <script src="vendor/circle-progress/circle-progress.min.js"></script>
+    <script src="vendor/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="vendor/chartjs/Chart.bundle.min.js"></script>
+    <script src="vendor/select2/select2.min.js">
+    </script>
+
+    <!-- Main JS-->
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
+<!-- end document-->
